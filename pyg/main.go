@@ -1,9 +1,9 @@
 package main
 
 import (
-	_ "pygproject/pyg/routers"
+	_ "pyg/pyg/routers"
 	"github.com/astaxie/beego"
-	_ "pygproject/pyg/models"
+	_ "pyg/pyg/models"
 )
 
 func main() {
