@@ -1,5 +1,6 @@
 # pygproject
-XX购物网站生鲜买卖模块的搭建
+XX购物网站生鲜买卖模块的搭建<br>
+
 负责人信息
 
 <details>
