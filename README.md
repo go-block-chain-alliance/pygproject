@@ -23,6 +23,7 @@ XX购物网站生鲜买卖模块的搭建<br>
 
 │   │   └──   Owner: MuYiMing,HanYihu
 
+│   │   └──   MuYiMing:完成了注册页面显示
 </code></pre>
 
 </details>
