@@ -142,7 +142,7 @@ func(this*UserController)HandleRegister(){
 	user.Phone = phone
 	o.Insert(&user)
 	//激活页面
-	this.Ctx.SetCookie("userName",user.Name,60 * 20)
+	this.Ctx.SetCookie("userName",user.Name,60 * 10)
 	this.Redirect("/register-email",302)
 
 	//返回数据
@@ -187,20 +187,18 @@ func(this*UserController)HandleEmail(){
 	//处理数据
 	//发送邮件
 	//utils     全局通用接口  工具类  邮箱配置   25,587
-	config := `{"username":"694021705@qq.com","password":"dyocwkafyotxbebb","host":"smtp.qq.com","port":587}`
+	config := `{"username":"czbkttsx@163.com","password":"czbkpygbj3q","host":"smtp.163.com","port":25}`
 	emailReg :=utils.NewEMail(config)
 	//内容配置
 	emailReg.Subject = "品优购用户激活"
-	emailReg.From = "694021705@qq.com"
+	emailReg.From = "czbkttsx@163.com"
 	emailReg.To = []string{email}
 	userName := this.Ctx.GetCookie("userName")
-	emailReg.HTML = `<a href="http://192.168.179.65:8080/active?userName=`+userName+`"> 点击激活bee ru该用户</a>`
+	emailReg.HTML = `<a href="http://192.168.230.81:8080/active?userName=`+userName+`"> 点击激活该用户</a>`
 
 	//发送
 	err := emailReg.Send()
-	if err!=nil{
-		beego.Error(err)
-	}
+	beego.Error(err)
 
 	//插入邮箱   更新邮箱字段
 	o := orm.NewOrm()

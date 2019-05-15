@@ -10,6 +10,7 @@ type GoodsController struct {
 	beego.Controller
 }
 
+//展示首页
 func(this*GoodsController)ShowIndex(){
 	name := this.GetSession("name")
 	if name != nil {
@@ -61,4 +62,49 @@ func(this*GoodsController)ShowIndex(){
 
 	this.Data["types"] = types
 	this.TplName = "index.html"
+}
+
+//展示生鲜首页
+func(this*GoodsController)ShowIndexSx(){
+	//获取生鲜首页内容
+	//获取商品类型
+	o := orm.NewOrm()
+	//获取所有类型
+	var goodsTypes []models.GoodsType
+	o.QueryTable("GoodsType").All(&goodsTypes)
+	this.Data["goodsTypes"] = goodsTypes
+	//获取轮播图
+	var goodsBanners []models.IndexGoodsBanner
+	o.QueryTable("IndexGoodsBanner").OrderBy("Index").All(&goodsBanners)
+	this.Data["goodsBanners"] = goodsBanners
+
+	//获取促销商品
+	var promotionBanners []models.IndexPromotionBanner
+	o.QueryTable("IndexPromotionBanner").OrderBy("Index").All(&promotionBanners)
+	this.Data["promotions"] = promotionBanners
+
+	//获取首页商品展示
+	var goods []map[string]interface{}
+
+	for _,v := range goodsTypes{
+		var textGoods []models.IndexTypeGoodsBanner
+		var imageGoods []models.IndexTypeGoodsBanner
+		qs:=o.QueryTable("IndexTypeGoodsBanner").RelatedSel("GoodsType","GoodsSKU").Filter("GoodsType__Id",v.Id).OrderBy("Index")
+		//获取文字商品
+		qs.Filter("DisplayType",0).All(&textGoods)
+		//获取图片商品
+		qs.Filter("DisplayType",1).All(&imageGoods)
+
+		//定义行容器
+		temp := make(map[string]interface{})
+		temp["goodsType"] = v
+		temp["textGoods"] = textGoods
+		temp["imageGoods"] = imageGoods
+
+		//把行容器追加到总容器中
+		goods = append(goods,temp)
+	}
+	this.Data["goods"] = goods
+
+	this.TplName = "index_sx.html"
 }
