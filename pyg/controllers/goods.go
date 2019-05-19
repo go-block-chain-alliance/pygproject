@@ -4,6 +4,8 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"pyg/pyg/models"
+	"math"
+	"github.com/gomodule/redigo/redis"
 )
 
 type GoodsController struct {
@@ -107,4 +109,165 @@ func(this*GoodsController)ShowIndexSx(){
 	this.Data["goods"] = goods
 
 	this.TplName = "index_sx.html"
+}
+
+//独立于beego框架的
+
+func PageEdit(pageCount int,pageIndex int)[]int{
+	//不足五页
+	var pages []int
+	if pageCount < 5{
+		for i:=1;i<=pageCount;i++{
+			pages = append(pages,i)
+		}
+	}else if pageIndex <= 3{
+		for i:=1;i<=5;i++{
+			pages = append(pages,i)
+		}
+	}else if pageIndex >= pageCount -2{
+		for i:=pageCount - 4;i<=pageCount;i++{
+			pages = append(pages,i)
+		}
+	}else {
+		for i:=pageIndex - 2;i<=pageIndex + 2;i++{
+			pages = append(pages,i)
+		}
+	}
+
+	return pages
+}
+
+//商品详情页
+func(this*GoodsController)ShowDetail(){
+	//获取数据
+	id,err := this.GetInt("Id")
+	//校验数据
+	if err != nil {
+		beego.Error("商品链接错误")
+		this.Redirect("/index_sx",302)
+		return
+	}
+	//处理数据
+	//根据id获取商品有关数据
+	o := orm.NewOrm()
+	var goodsSku models.GoodsSKU
+	/*goodsSku.Id = id
+	o.Read(&goodsSku)*/
+	//获取商品详情
+	o.QueryTable("GoodsSKU").RelatedSel("Goods","GoodsType").Filter("Id",id).One(&goodsSku)
+
+	//获取同一类型的新品推荐
+	var newGoods []models.GoodsSKU
+	qs := o.QueryTable("GoodsSKU").RelatedSel("GoodsType").Filter("GoodsType__Name",goodsSku.GoodsType.Name)
+	qs.OrderBy("-Time").Limit(2,0).All(&newGoods)
+
+	//存储浏览记录
+	name := this.GetSession("name")
+	if name != nil {
+		//把历史浏览记录存储在redis中
+		conn,err := redis.Dial("tcp","192.168.179.65:6379")
+		if err == nil {
+			defer conn.Close()
+			conn.Do("lrem","history_"+name.(string),0,id)
+			_,err = conn.Do("lpush","history_"+name.(string),id)
+			beego.Info(err)
+		}
+	}
+
+
+	this.Data["newGoods"] = newGoods
+	//传递数据
+	this.Data["goodsSku"] = goodsSku
+	this.TplName = "detail.html"
+}
+
+//展示商品列表页
+func(this*GoodsController)ShowList(){
+	//获取数据
+	id,err := this.GetInt("id")
+	//校验数据
+	if err != nil {
+		beego.Error("类型不存在")
+		this.Redirect("/index_sx",302)
+		return
+	}
+	//处理数据
+	o := orm.NewOrm()
+	var goods []models.GoodsSKU
+	//获取排序方式
+	sort := this.GetString("sort")
+
+	//实现分页
+
+	qs := o.QueryTable("GoodsSKU").RelatedSel("GoodsType").Filter("GoodsType__Id",id)
+	//获取总页码
+	count,_ := qs.Count()
+	pageSize := 1
+	pageCount := int(math.Ceil(float64(count) / float64(pageSize)))
+	//获取当前页码
+	pageIndex,err := this.GetInt("pageIndex")
+	if err != nil {
+		pageIndex = 1
+	}
+	pages := PageEdit(pageCount,pageIndex)
+	this.Data["pages"] = pages
+	//获取上一页，下一页的值
+	var prePage,nextPage int
+	//设置个范围
+	if pageIndex -1 <= 0{
+		prePage = 1
+	}else {
+		prePage = pageIndex - 1
+	}
+
+
+	if pageIndex +1 >= pageCount{
+		nextPage = pageCount
+	}else {
+		nextPage = pageIndex + 1
+	}
+
+
+	this.Data["prePage"] = prePage
+	this.Data["nextPage"] = nextPage
+
+	qs = qs.Limit(pageSize,pageSize*(pageIndex - 1))
+
+	//获取排序
+	if sort == ""{
+		qs.All(&goods)
+	}else if sort == "price"{
+		qs.OrderBy("Price").All(&goods)
+	}else {
+		qs.OrderBy("-Sales").All(&goods)
+	}
+
+	this.Data["sort"] = sort
+
+
+
+	//返回数据
+	this.Data["id"] = id
+	this.Data["goods"] = goods
+	this.TplName = "list.html"
+}
+
+//搜索页面
+func(this*GoodsController)HandleSearch(){
+	//获取数据
+	goodsName := this.GetString("goodsName")
+	//校验数据
+	if goodsName == ""{
+		this.Redirect("/index_sx",302)
+		return
+	}
+	//处理数据
+	o := orm.NewOrm()
+	var goods []models.GoodsSKU
+	//模糊查询
+	o.QueryTable("GoodsSKU").Filter("Name__icontains",goodsName).All(&goods)
+
+	//返回数据
+	this.Data["goods"] = goods
+	this.TplName = "search.html"
 }

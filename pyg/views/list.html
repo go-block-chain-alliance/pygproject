@@ -3,8 +3,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>品优购，优质！优质！-商品列表</title>
-	<link rel="stylesheet" type="text/css" href="css/reset.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
 </head>
 <body>
 	<div class="header_con">
@@ -32,7 +32,7 @@
 	</div>
 
 	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="images/logo.png"></a>
+		<a href="index.html" class="logo fl"><img src="/static/images/logo.png"></a>
 		<div class="search_con fl">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
 			<input type="button" class="input_btn fr" name="" value="搜索">
@@ -94,157 +94,31 @@
 
 		<div class="r_wrap fr clearfix">
 			<div class="sort_bar">
-				<a href="#" class="active">默认</a>
-				<a href="#">价格</a>
-				<a href="#">人气</a>
+				<a href="/goodsType?id={{.id}}" {{if compare .sort ""}} class="active"{{end}}>默认</a>
+				<a href="/goodsType?sort=price&id={{.id}}" {{if compare .sort "price"}} class="active"{{end}}>价格</a>
+				<a href="/goodsType?sort=sale&id={{.id}}"  {{if compare .sort "sale"}} class="active"{{end}}>人气</a>
 			</div>
 
 			<ul class="goods_type_list clearfix">
+				{{range .goods}}
 				<li>
-					<a href="detail.html"><img src="images/goods/goods003.jpg"></a>
-					<h4><a href="detail.html">大兴大棚草莓</a></h4>
+					<a href="/goodsDetail?Id={{.Id}}"><img src="http://192.168.179.65:8888/{{.Image}}"></a>
+					<h4><a href="/goodsDetail?Id={{.Id}}">{{.Name}}</a></h4>
 					<div class="operate">
-						<span class="prize">￥16.80</span>
-						<span class="unit">16.80/500g</span>
+						<span class="prize">￥{{.Price}}</span>
+						<span class="unit">{{.Price}}/{{.Unite}}</span>
 						<a href="#" class="add_goods" title="加入购物车"></a>
 					</div>
 				</li>
-
-				<li>
-					<a href="#"><img src="images/goods/goods004.jpg"></a>
-					<h4><a href="#">吐鲁番梨光杏</a></h4>
-					<div class="operate">
-						<span class="prize">￥5.50</span>
-						<span class="unit">5.50/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="images/goods/goods005.jpg"></a>
-					<h4><a href="#">黄肉桃</a></h4>
-					<div class="operate">
-						<span class="prize">￥10.00</span>
-						<span class="unit">10.00/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="images/goods/goods006.jpg"></a>
-					<h4><a href="#">进口西梅</a></h4>
-					<div class="operate">
-						<span class="prize">￥28.80</span>
-						<span class="unit">28.8/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="images/goods/goods007.jpg"></a>
-					<h4><a href="#">香梨</a></h4>
-					<div class="operate">
-						<span class="prize">￥6.45</span>
-						<span class="unit">6.45/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="images/goods/goods008.jpg"></a>
-					<h4><a href="#">栗子</a></h4>
-					<div class="operate">
-						<span class="prize">￥9.50</span>
-						<span class="unit">9.50/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="images/goods/goods009.jpg"></a>
-					<h4><a href="#">海南香蕉</a></h4>
-					<div class="operate">
-						<span class="prize">￥3.30</span>
-						<span class="unit">3.30/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="images/goods/goods010.jpg"></a>
-					<h4><a href="#">青苹果</a></h4>
-					<div class="operate">
-						<span class="prize">￥5.00</span>
-						<span class="unit">5.00/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="images/goods/goods011.jpg"></a>
-					<h4><a href="#">山莓</a></h4>
-					<div class="operate">
-						<span class="prize">￥28.80</span>
-						<span class="unit">28.8/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="images/goods/goods012.jpg"></a>
-					<h4><a href="#">奇异果</a></h4>
-					<div class="operate">
-						<span class="prize">￥25.80</span>
-						<span class="unit">25.8/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-				<li>
-					<a href="#"><img src="images/goods/goods013.jpg"></a>
-					<h4><a href="#">蜜桔</a></h4>
-					<div class="operate">
-						<span class="prize">￥4.80</span>
-						<span class="unit">4.8/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-				<li>
-					<a href="#"><img src="images/goods/goods014.jpg"></a>
-					<h4><a href="#">脐橙</a></h4>
-					<div class="operate">
-						<span class="prize">￥3.50</span>
-						<span class="unit">3.50/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-				<li>
-					<a href="#"><img src="images/goods/goods001.jpg"></a>
-					<h4><a href="#">进口柠檬</a></h4>
-					<div class="operate">
-						<span class="prize">￥3.90</span>
-						<span class="unit">3.90/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-				<li>
-					<a href="#"><img src="images/goods/goods002.jpg"></a>
-					<h4><a href="#">玫瑰香葡萄</a></h4>
-					<div class="operate">
-						<span class="prize">￥16.80</span>
-						<span class="unit">16.80/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
+				{{end}}
 			</ul>
 
 			<div class="pagenation">
-				<a href="#"><上一页</a>
-				<a href="#" class="active">1</a>
-				<a href="#">2</a>
-				<a href="#">3</a>
-				<a href="#">4</a>
-				<a href="#">5</a>
-				<a href="#">下一页></a>
+				<a href="/goodsType?id={{.id}}&sort={{.sort}}&pageIndex={{.prePage}}"><上一页</a>
+				{{range $key,$value := .pages}}
+				<a href="/goodsType?id={{$.id}}&sort={{$.sort}}&pageIndex={{$value}}" class="active">{{$value}}</a>
+				{{end}}
+				<a href="/goodsType?id={{.id}}&sort={{.sort}}&pageIndex={{.nextPage}}">下一页></a>
 			</div>
 		</div>
 	</div>

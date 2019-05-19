@@ -16,14 +16,15 @@ import (
 
 type UserController struct {
 	beego.Controller
+
 }
 
 
 func(this*UserController)ShowRegister(){
 	this.TplName = "register.html"
 }
-
-func RespFunc(this* UserController,resp map[string]interface{}){
+//面向对象
+func RespFunc(this* beego.Controller,resp map[string]interface{}){
 	//3.把容器传递给前段
 	this.Data["json"] = resp
 	//4.指定传递方式
@@ -43,7 +44,7 @@ func(this*UserController)HandleSendMsg(){
 	phone := this.GetString("phone")
 	resp := make(map[string]interface{})
 
-	defer RespFunc(this,resp)
+	defer RespFunc(&this.Controller,resp)
 	//返回json格式数据
 	//校验数据
 	if phone == ""{
@@ -194,7 +195,7 @@ func(this*UserController)HandleEmail(){
 	emailReg.From = "czbkttsx@163.com"
 	emailReg.To = []string{email}
 	userName := this.Ctx.GetCookie("userName")
-	emailReg.HTML = `<a href="http://192.168.230.81:8080/active?userName=`+userName+`"> 点击激活该用户</a>`
+	emailReg.HTML = `<a href="http://192.168.179.65:8080/active?userName=`+userName+`"> 点击激活该用户</a>`
 
 	//发送
 	err := emailReg.Send()
@@ -384,6 +385,7 @@ func(this*UserController)ShowSite(){
 
 //添加地址
 func(this*UserController)HandleSite(){
+
 	//获取数据
 	receiver := this.GetString("receiver")
 	addr := this.GetString("addr")
@@ -449,4 +451,31 @@ func(this*UserController)HandleSite(){
 
 	//返回数据
 	this.Redirect("/user/site",302)
+}
+
+//展示用户订单
+func(this*UserController)ShowUserOrder(){
+	//从数据库中获取当前用户所有订单信息
+	name := this.GetSession("name")
+	//获取订单信息
+	o :=orm.NewOrm()
+	var orderinfos []models.OrderInfo
+	o.QueryTable("OrderInfo").RelatedSel("User").Filter("User__Name",name.(string)).OrderBy("-Time").All(&orderinfos)
+
+	var orders []map[string]interface{}
+	for _,v := range orderinfos{
+		temp := make(map[string]interface{})
+		//获取当前订单所有的订单商品
+		var orderGoods []models.OrderGoods
+		o.QueryTable("OrderGoods").RelatedSel("OrderInfo","GoodsSKU").Filter("OrderInfo__Id",v.Id).All(&orderGoods)
+
+		temp["orderGoods"] = orderGoods
+		temp["orderInfo"] = v
+
+		orders = append(orders,temp)
+	}
+
+	this.Data["orders"] = orders
+	this.Layout = "userLayout.html"
+	this.TplName = "user_center_order.html"
 }
